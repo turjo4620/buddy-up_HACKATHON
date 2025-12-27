@@ -93,7 +93,18 @@ const MOCK_DATA = {
       teamSize: 4,
       status: 'Looking for members',
       owner: { _id: 'mock-profile-1', name: 'John Doe', department: 'Computer Science' },
-      members: [{ profile: 'mock-profile-1', role: 'Owner' }]
+      members: [{ profile: 'mock-profile-1', role: 'Owner' }],
+      joinRequests: [] // Added missing joinRequests array
+    }
+  ],
+  joinRequests: [
+    {
+      _id: 'mock-request-1',
+      project: 'mock-project-1',
+      student: 'mock-profile-2',
+      status: 'Pending',
+      message: 'I would love to join this project!',
+      createdAt: new Date().toISOString()
     }
   ]
 };
@@ -434,6 +445,31 @@ export const updateJoinRequestStatus = async (requestId, status, reviewerId) => 
     return response.data;
   } catch (error) {
     handleApiError(error, 'update join request status');
+  }
+};
+
+// Accept a join request
+export const acceptJoinRequest = async (requestId, reviewerId) => {
+  return updateJoinRequestStatus(requestId, 'Accepted', reviewerId);
+};
+
+// Reject a join request
+export const rejectJoinRequest = async (requestId, reviewerId) => {
+  return updateJoinRequestStatus(requestId, 'Rejected', reviewerId);
+};
+
+// Get join requests for current user (as a student)
+export const getMyJoinRequests = async () => {
+  if (CONFIG.USE_MOCK_DATA) {
+    await mockDelay();
+    return { success: true, count: MOCK_DATA.joinRequests.length, data: MOCK_DATA.joinRequests };
+  }
+
+  try {
+    const response = await api.get('/joinRequests/my-requests');
+    return response.data;
+  } catch (error) {
+    handleApiError(error, 'fetch my join requests');
   }
 };
 

@@ -269,9 +269,46 @@ const updateJoinRequestStatus = async (req, res) => {
   }
 };
 
+// Get join requests for current user (requires authentication)
+const getMyJoinRequests = async (req, res) => {
+  try {
+    const studentId = req.user?.id || req.query.studentId;
+    
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Student ID is required'
+      });
+    }
+
+    const requests = await JoinRequest.find({ studentId })
+      .populate('projectId', 'title description owner')
+      .populate({
+        path: 'projectId',
+        populate: {
+          path: 'owner',
+          select: 'name department'
+        }
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: requests.length,
+      data: requests
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   sendJoinRequest,
   getJoinRequestsForProject,
   getJoinRequestsByStudent,
-  updateJoinRequestStatus
+  updateJoinRequestStatus,
+  getMyJoinRequests
 };

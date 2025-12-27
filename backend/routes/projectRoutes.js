@@ -16,6 +16,9 @@ router.route('/')
   .get(getProjects)
   .post(createProject);
 
+// Specific routes must come BEFORE parameterized routes
+router.get('/owner/:ownerId', getProjectsByOwner);
+
 router.route('/:id')
   .get(getProject)
   .put(updateProject)
@@ -24,6 +27,5 @@ router.route('/:id')
 // Additional project management routes
 router.get('/:id/members', getProjectMembers);
 router.put('/:id/status', updateProjectStatus);
-router.get('/owner/:ownerId', getProjectsByOwner);
 
 module.exports = router;

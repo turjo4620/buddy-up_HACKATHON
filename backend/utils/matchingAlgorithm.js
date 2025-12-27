@@ -1,5 +1,3 @@
-// Basic matching algorithm to find suggested teammates for projects
-
 const calculateSkillOverlap = (studentSkills, requiredSkills) => {
   if (!requiredSkills || requiredSkills.length === 0) return 0;
   if (!studentSkills || studentSkills.length === 0) return 0;
@@ -14,12 +12,22 @@ const calculateSkillOverlap = (studentSkills, requiredSkills) => {
   return matchingSkills.length;
 };
 
+const calculateMatchingSkills = (studentSkills, requiredSkills) => {
+  if (!requiredSkills || requiredSkills.length === 0) return [];
+  if (!studentSkills || studentSkills.length === 0) return [];
+
+  return studentSkills.filter(skill => 
+    requiredSkills.some(required => 
+      required.toLowerCase().includes(skill.toLowerCase()) ||
+      skill.toLowerCase().includes(required.toLowerCase())
+    )
+  );
+};
+
 const calculateMatchScore = (studentSkills, requiredSkills, studentInterests, projectTitle, projectDescription) => {
-  // Primary scoring based on skill overlap
   const skillMatches = calculateSkillOverlap(studentSkills, requiredSkills);
   const skillScore = (skillMatches / Math.max(requiredSkills.length, 1)) * 100;
 
-  // Secondary scoring based on interest alignment
   let interestScore = 0;
   if (studentInterests && studentInterests.length > 0) {
     const projectText = `${projectTitle} ${projectDescription}`.toLowerCase();
@@ -29,12 +37,12 @@ const calculateMatchScore = (studentSkills, requiredSkills, studentInterests, pr
     interestScore = (matchingInterests.length / studentInterests.length) * 30;
   }
 
-  // Combined score (70% skills, 30% interests)
   return Math.round((skillScore * 0.7) + (interestScore * 0.3));
 };
 
 const findSuggestedTeammates = async (project, allProfiles) => {
-  // Exclude project owner and existing members
+  if (!project || !allProfiles) return [];
+
   const excludedIds = [
     project.owner.toString(),
     ...project.members.map(member => member.profile.toString())
@@ -44,8 +52,8 @@ const findSuggestedTeammates = async (project, allProfiles) => {
     !excludedIds.includes(profile._id.toString())
   );
 
-  // Calculate match scores for each eligible student
   const matches = eligibleStudents.map(student => {
+    const matchingSkills = calculateMatchingSkills(student.skills || [], project.requiredSkills || []);
     const matchScore = calculateMatchScore(
       student.skills || [],
       project.requiredSkills || [],
@@ -64,35 +72,20 @@ const findSuggestedTeammates = async (project, allProfiles) => {
         projectInterests: student.projectInterests
       },
       matchScore,
-      matchingSkills: calculateMatchingSkills(student.skills || [], project.requiredSkills || []),
+      matchingSkills,
       skillOverlapCount: calculateSkillOverlap(student.skills || [], project.requiredSkills || [])
     };
   });
 
-  // Filter students with at least some skill overlap and sort by match score
-  const suggestedTeammates = matches
+  return matches
     .filter(match => match.skillOverlapCount > 0)
     .sort((a, b) => b.matchScore - a.matchScore)
-    .slice(0, 10); // Return top 10 matches
-
-  return suggestedTeammates;
+    .slice(0, 10);
 };
 
-const calculateMatchingSkills = (studentSkills, requiredSkills) => {
-  if (!requiredSkills || requiredSkills.length === 0) return [];
-  if (!studentSkills || studentSkills.length === 0) return [];
-
-  return studentSkills.filter(skill => 
-    requiredSkills.some(required => 
-      required.toLowerCase().includes(skill.toLowerCase()) ||
-      skill.toLowerCase().includes(required.toLowerCase())
-    )
-  );
-};
-
-// Find projects that match a student's skills
 const findMatchingProjects = async (student, allProjects) => {
-  // Exclude projects where student is owner or member
+  if (!student || !allProjects) return [];
+
   const excludedProjectIds = [
     ...(student.projectsCreated || []).map(id => id.toString()),
     ...(student.projectsJoined || []).map(id => id.toString())

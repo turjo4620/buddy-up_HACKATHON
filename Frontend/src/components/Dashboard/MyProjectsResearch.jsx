@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProjectResearchCard from './ProjectResearchCard';
+import EnhancedMyProjectCard from './EnhancedMyProjectCard';
 import './MyProjectsResearch.css';
 
 const MyProjectsResearch = ({ 
@@ -122,18 +123,31 @@ const MyProjectsResearch = ({
           </div>
         ) : (
           <div className={`items-container ${viewMode}`}>
-            {currentData.map((item) => (
-              <ProjectResearchCard
-                key={item._id}
-                item={item}
-                type={currentType}
-                viewMode={viewMode}
-                statusColor={getStatusColor(item.status)}
-                onView={activeTab === 'projects' ? handleViewProject : handleViewResearch}
-                onViewRequests={handleViewRequests}
-                onViewSuggestions={handleViewSuggestions}
-              />
-            ))}
+            {activeTab === 'projects' ? (
+              // Enhanced project cards with recommendation feature
+              currentData.map((project) => (
+                <EnhancedMyProjectCard
+                  key={project._id}
+                  project={project}
+                  joinRequestsCount={project.joinRequests?.length || 0}
+                  onViewDetails={() => handleViewProject(project._id)}
+                />
+              ))
+            ) : (
+              // Regular research cards
+              currentData.map((item) => (
+                <ProjectResearchCard
+                  key={item._id}
+                  item={item}
+                  type={currentType}
+                  viewMode={viewMode}
+                  statusColor={getStatusColor(item.status)}
+                  onView={handleViewResearch}
+                  onViewRequests={handleViewRequests}
+                  onViewSuggestions={handleViewSuggestions}
+                />
+              ))
+            )}
           </div>
         )}
       </div>

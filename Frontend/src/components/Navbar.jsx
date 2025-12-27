@@ -179,6 +179,15 @@ const Navbar = () => {
                 <span className="nav-text">AI</span>
               </Link>
 
+              {/* Demo */}
+              <Link 
+                to="/recommendation-demo" 
+                className={`nav-item ${isActivePath('/recommendation-demo') ? 'active' : ''}`}
+              >
+                <span className="nav-icon">✨</span>
+                <span className="nav-text">Demo</span>
+              </Link>
+
               {/* Profile Dropdown */}
               <div className="nav-dropdown profile-dropdown" ref={profileRef}>
                 <button

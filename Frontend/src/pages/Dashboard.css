@@ -20,14 +20,12 @@
 }
 
 /* ============================================================================
-   TOP SECTION - PROFILE & STATS
+   TOP SECTION - STATS ONLY
    ============================================================================ */
 
 .dashboard-top-section {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2rem;
-  align-items: start;
+  display: flex;
+  justify-content: center;
 }
 
 /* ============================================================================
@@ -181,11 +179,6 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard-top-section {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
   .dashboard-content {
     padding: 1rem;
     gap: 1.5rem;

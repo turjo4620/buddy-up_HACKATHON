@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../components/Dashboard/DashboardHeader';
-import ProfileSummary from '../components/Dashboard/ProfileSummary';
 import StatsOverview from '../components/Dashboard/StatsOverview';
 import MyProjectsResearch from '../components/Dashboard/MyProjectsResearch';
 import JoinRequestsPanel from '../components/Dashboard/JoinRequestsPanel';
@@ -181,9 +180,8 @@ const Dashboard = () => {
       <DashboardHeader user={user} />
       
       <div className="dashboard-content">
-        {/* Top Section - Profile & Stats */}
+        {/* Top Section - Stats Only */}
         <div className="dashboard-top-section">
-          <ProfileSummary user={user} />
           <StatsOverview stats={dashboardData.stats} />
         </div>
 

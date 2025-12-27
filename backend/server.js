@@ -33,8 +33,9 @@ const researchRoutes = require('./routes/researchRoutes');
 
 // Import utilities
 const { findSuggestedTeammates, findMatchingProjects } = require('./utils/matchingAlgorithm');
-const { handleAIGuidance } = require('./ai/aiChatHandler');
+const { handleAIGuidance } = require('./ai/enhancedAiHandler');
 const { authenticateToken } = require('./controllers/authController');
+const { seedDatabase } = require('./utils/sampleData');
 const Profile = require('./models/Profile');
 const Project = require('./models/Project');
 
@@ -252,6 +253,30 @@ app.get('/api/health', (req, res) => {
   
   console.log('🏥 Health check requested');
   res.status(200).json(healthInfo);
+});
+
+// Database seeding endpoint (for development/demo purposes)
+app.post('/api/seed', async (req, res) => {
+  try {
+    console.log('🌱 Database seeding requested...');
+    const result = await seedDatabase();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Database seeded successfully',
+      data: {
+        profilesCreated: result.profiles.length,
+        projectsCreated: result.projects.length
+      }
+    });
+  } catch (error) {
+    console.error('❌ Seeding failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Database seeding failed',
+      error: error.message
+    });
+  }
 });
 
 // Response logging middleware
